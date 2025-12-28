@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>தாஸ் பொது சேவை மையம்</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; }
+        .header-section { background: #ffffff; border-bottom: 5px solid #25D366; padding: 25px; text-align: center; }
+        .nav-bar { background: #075E54; color: white; padding: 12px 0; }
+        .btn-whatsapp { color: #25D366; font-size: 1.5rem; cursor: pointer; }
+        .hidden { display: none !important; }
+        .admin-only { background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 15px; }
+        .done-task { text-decoration: line-through; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <h2 class="fw-bold text-success">தாஸ் பொது சேவை மையம்</h2>
+        <h6 class="text-secondary">(மத்திய மாநில அரசு அங்கீகாரம் பெற்றது)</h6>
+        <p class="mb-1">147எ, கிரேட் காட்டன் ரோடு, தூத்துக்குடி-628001</p>
+        <p class="mb-0 small">செல்: 98 43 23 23 24 / 88 70 23 23 32</p>
+    </div>
+
+    <div class="nav-bar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-grid-3x3-gap-fill"></i> சேவை விண்ணப்பங்கள்</span>
+            <button onclick="toggleAdmin()" class="btn btn-sm btn-outline-light" id="adminToggleBtn">நிர்வாகி நுழைவு</button>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        
+        <div id="adminPanel" class="admin-only hidden">
+            <div class="mb-3 p-2 bg-white border rounded">
+                <label class="small fw-bold text-danger">உங்கள் கிட்ஹப் இணையதள முகவரி (GitHub URL):</label>
+                <input type="text" id="githubUrl" class="form-control form-control-sm" placeholder="https://yourname.github.io/csc/" onchange="saveGithubUrl()">
+                <small class="text-muted">இதை ஒருமுறை மட்டும் கொடுத்தால் போதும்.</small>
+            </div>
+
+            <h5 class="text-dark mb-3"><i class="bi bi-plus-circle"></i> புதிய விண்ணப்பம் சேர்</h5>
+            <div class="row g-2">
+                <div class="col-md-1"><input type="text" id="fId" class="form-control" placeholder="ID"></div>
+                <div class="col-md-2"><input type="text" id="fCat" class="form-control" placeholder="வகை"></div>
+                <div class="col-md-2"><input type="text" id="fName" class="form-control" placeholder="பெயர்"></div>
+                <div class="col-md-3"><input type="text" id="fDocs" class="form-control" placeholder="ஆவணங்கள்"></div>
+                <div class="col-md-1"><input type="text" id="fFee" class="form-control" placeholder="கட்டணம்"></div>
+                <div class="col-md-3"><input type="file" id="fFile" class="form-control form-control-sm"></div>
+                <div class="col-md-12 text-end mt-2">
+                    <button onclick="saveNewForm()" class="btn btn-success btn-sm px-4">சேமி</button>
+                </div>
+            </div>
+
+            <hr>
+            <h5><i class="bi bi-journal-text"></i> மெசேஜ் சென்றவர்கள் விபரம் (Report)</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr><th>நாள்</th><th>வாடிக்கையாளர்</th><th>செல் எண்</th><th>சேவை</th><th class="text-center">ஆக்சன்</th></tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-responsive mt-4 bg-white p-3 rounded shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr><th>ID</th><th>சேவை வகை</th><th>சேவை பெயர்</th><th>விண்ணப்பம்</th><th>ஆவணங்கள்</th><th>கட்டணம்</th><th>WhatsApp</th><th class="admin-only-cell hidden">நீக்க</th></tr>
+                </thead>
+                <tbody id="mainTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="waModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">மெசேஜ் அனுப்பவும்</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="waIndex">
+                    <div class="mb-3"><label>பெயர்:</label><input type="text" id="custName" class="form-control"></div>
+                    <div class="mb-3"><label>வாடிக்கையாளர் மொபைல்:</label><input type="number" id="custMobile" class="form-control" placeholder="91XXXXXXXXXX"></div>
+                </div>
+                <div class="modal-footer"><button onclick="processWhatsApp()" class="btn btn-success w-100">அனுப்பு</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let services = JSON.parse(localStorage.getItem('dhass_services')) || [];
+        let reports = JSON.parse(localStorage.getItem('dhass_reports')) || [];
+        let siteUrl = localStorage.getItem('dhass_github_url') || "";
+        let isAdmin = false;
+
+        document.getElementById('githubUrl').value = siteUrl;
+
+        function saveGithubUrl() {
+            siteUrl = document.getElementById('githubUrl').value;
+            localStorage.setItem('dhass_github_url', siteUrl);
+        }
+
+        function toggleAdmin() {
+            if (prompt("அட்மின் பாஸ்வேர்டு:") === "admin123") {
+                isAdmin = true;
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.querySelectorAll('.admin-only-cell').forEach(el => el.classList.remove('hidden'));
+                renderTable(); renderReports();
+            }
+        }
+
+        function saveNewForm() {
+            const fileInput = document.getElementById('fFile');
+            const file = fileInput.files[0];
+            if(!file) return alert("கோப்பைத் தேர்ந்தெடுக்கவும்!");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                services.push({
+                    id: document.getElementById('fId').value,
+                    cat: document.getElementById('fCat').value,
+                    name: document.getElementById('fName').value,
+                    docs: document.getElementById('fDocs').value,
+                    fee: document.getElementById('fFee').value,
+                    fileData: e.target.result,
+                    fileName: file.name
+                });
+                localStorage.setItem('dhass_services', JSON.stringify(services));
+                renderTable();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('mainTableBody');
+            tbody.innerHTML = '';
+            services.forEach((s, i) => {
+                tbody.innerHTML += `
+                    <tr class="text-center">
+                        <td>${s.id}</td><td>${s.cat}</td><td>${s.name}</td>
+                        <td><a href="${s.fileData}" download="${s.fileName}" class="btn btn-sm btn-primary">Download</a></td>
+                        <td class="small text-start">${s.docs}</td><td>${s.fee}</td>
+                        <td><i class="bi bi-whatsapp btn-whatsapp" onclick="openWaModal(${i})"></i></td>
+                        ${isAdmin ? `<td class="admin-only-cell"><button class="btn btn-sm btn-danger" onclick="deleteS(${i})">X</button></td>` : ''}
+                    </tr>`;
+            });
+        }
+
+        function openWaModal(i) {
+            document.getElementById('waIndex').value = i;
+            new bootstrap.Modal(document.getElementById('waModal')).show();
+        }
+
+        function processWhatsApp() {
+            const i = document.getElementById('waIndex').value;
+            const s = services[i];
+            const name = document.getElementById('custName').value;
+            const mobile = document.getElementById('custMobile').value;
+            const myNum = "919843232324";
+
+            reports.unshift({ date: new Date().toLocaleString('ta-IN'), name, mobile, service: s.name, completed: false });
+            localStorage.setItem('dhass_reports', JSON.stringify(reports));
+
+            // GitHub லிங்க் உருவாக்கம்
+            const downloadLink = siteUrl ? `%0A%0A📥 படிவத்தை டவுன்லோட் செய்ய: ${siteUrl}` : "";
+            
+            const msg = `*தாஸ் பொது சேவை மையம்*%0Aதங்களை அன்புடன் வரவேற்கிறது.%0A%0A*வாடிக்கையாளர்:* ${name}%0A*செல் எண்:* ${mobile}%0A*சேவை:* ${s.name}${downloadLink}%0A%0Aதயவுசெய்து படிவத்தை பூர்த்தி செய்து எங்களை தொடர்பு கொள்ளவும்.%0A%0Aநன்றி, இந்த நாள் இனிதாக அமைய வாழ்த்துக்கள்.`;
+            
+            window.open(`https://wa.me/${myNum}?text=${msg}`, '_blank');
+            renderReports();
+            bootstrap.Modal.getInstance(document.getElementById('waModal')).hide();
+        }
+
+        function renderReports() {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '';
+            reports.forEach((r, i) => {
+                tbody.innerHTML += `
+                    <tr class="${r.completed ? 'done-task' : ''}">
+                        <td>${r.date}</td><td>${r.name}</td><td>${r.mobile}</td><td>${r.service}</td>
+                        <td class="text-center"><input type="checkbox" ${r.completed ? 'checked' : ''} onchange="toggleT(${i})"></td>
+                    </tr>`;
+            });
+        }
+
+        function toggleT(i) { reports[i].completed = !reports[i].completed; localStorage.setItem('dhass_reports', JSON.stringify(reports)); renderReports(); }
+        function deleteS(i) { if(confirm("நீக்கலாமா?")) { services.splice(i,1); localStorage.setItem('dhass_services', JSON.stringify(services)); renderTable(); } }
+
+        renderTable();
+    </script>
+</body>
+</html>
